@@ -10,7 +10,7 @@ import logging
 from faker import Faker
 from tzlocal import get_localzone
 
-logging.basicConfig(filename='fake_log_gen.log', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(asctime)s %(message)s', level=logging.INFO)
 
 faker = Faker()
 local_zone = get_localzone()
@@ -64,9 +64,9 @@ if __name__ == "__main__":
     parser.add_argument("--stream", "-k", dest='stream_name', help="Kinesis Stream name to publish the logs",
                         default="apache-log-stream")
     parser.add_argument("--region", "-r", dest='region_name', help="Kinesis Stream Region",
-                        default="us-west-1")
+                        default="us-west-2")
     parser.add_argument("--num", "-n", dest='num_lines', help="Number of lines to generate (0 for infinite)", type=int,
-                        default=1)
+                        default=5)
     parser.add_argument("--sleep", "-s", dest='sleep_secs', help="Sleep between lines (in seconds)", default=0.0, type=float)
 
     args = parser.parse_args()
@@ -74,9 +74,9 @@ if __name__ == "__main__":
 
     kinesis_client = boto3.client('kinesis', region_name=args.region_name)
 
-    while (num_lines > 0):
+    while num_lines > 0:
         put_to_stream(kinesis_client, args.stream_name, 'aa')
         num_lines = num_lines - 1
 
-        if args.sleep:
+        if args.sleep_secs:
             time.sleep(args.sleep_secs)
